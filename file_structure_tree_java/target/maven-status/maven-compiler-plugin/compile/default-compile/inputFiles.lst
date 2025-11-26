@@ -1,1 +1,4 @@
-/home/sces82/GIT/file_structure_tree_java/src/main/java/org/example/Main.java
+/home/sces82/GIT/file_structure_traversal_project_Java/file_structure_tree_java/src/main/java/org/example/manager/TraversalManager.java
+/home/sces82/GIT/file_structure_traversal_project_Java/file_structure_tree_java/src/main/java/org/example/Main.java
+/home/sces82/GIT/file_structure_traversal_project_Java/file_structure_tree_java/src/main/java/org/example/manager/traversal/TraversalManagerImpl.java
+/home/sces82/GIT/file_structure_traversal_project_Java/file_structure_tree_java/src/main/java/org/example/dto/NodeDTO.java

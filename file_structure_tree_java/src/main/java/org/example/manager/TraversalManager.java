@@ -1,5 +1,10 @@
 package org.example.manager;
 
-public class TraversalManager {
+import java.nio.file.Path;
 
+public interface TraversalManager {
+    
+    public void traverse_path( String path );
+
+    
 }
