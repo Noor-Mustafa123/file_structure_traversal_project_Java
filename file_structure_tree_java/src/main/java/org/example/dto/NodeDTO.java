@@ -1,30 +1,30 @@
 package org.example.dto;
 
-import java.util.List;
+import lombok.*;
 
+import java.util.List;
+import java.util.UUID;
+
+@NoArgsConstructor
 public class NodeDTO {
 
-    public String id;
+    private UUID id;
 
-    public String name;
+    private String name;
 
-    public String type;
+    private String path;
 
-    public List< NodeDTO > nodeDTOList;
+    private String type;
 
-    public NodeDTO( String id, String name, String type, List< NodeDTO > nodeDTOList ) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.nodeDTOList = nodeDTOList;
+    private List< NodeDTO > childrenNodes;
+
+
+    public List< NodeDTO > getChildrenNodes() {
+        return childrenNodes;
     }
 
-    public List< NodeDTO > getNodeDTOList() {
-        return nodeDTOList;
-    }
-
-    public void setNodeDTOList( List< NodeDTO > nodeDTOList ) {
-        this.nodeDTOList = nodeDTOList;
+    public void setChildrenNodes(List< NodeDTO > childrenNodes) {
+        this.childrenNodes = childrenNodes;
     }
 
     public String getType() {
@@ -43,12 +43,21 @@ public class NodeDTO {
         this.name = name;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId( String id ) {
+    public void setId( UUID id ) {
         this.id = id;
     }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
 
 }
