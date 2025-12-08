@@ -12,13 +12,16 @@ public class TreeNodePreparationTask implements Callable< TreeNode > {
 
     final Path path;
 
-    public TreeNodePreparationTask( Path path ) {
+    final ExecutorService executorService;
+
+    public TreeNodePreparationTask( Path path, ExecutorService executorService ) {
         this.path = path;
+        this.executorService = executorService;
     }
     @Override
     public TreeNode call() throws Exception {
         TraversalManager traversalManager = new TraversalManagerImpl();
-        return traversalManager.prepareNodTreeObject( this.path );
+        return traversalManager.prepareNodTreeObject( path, executorService );
     }
 
 }

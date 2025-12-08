@@ -9,6 +9,6 @@ public interface TraversalManager {
     
     void traverse_path( String path );
 
-    TreeNode prepareNodTreeObject( Path pathObj );
+    TreeNode prepareNodTreeObject( Path pathObj, ExecutorService executorService );
 
     }

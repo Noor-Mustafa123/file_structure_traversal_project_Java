@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,8 +19,6 @@ import org.example.manager.TraversalManager;
 import org.example.tasks.TreeNodePreparationTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.source.tree.Tree;
 
 import lombok.NoArgsConstructor;
 
@@ -39,12 +38,12 @@ public class TraversalManagerImpl implements TraversalManager {
     @Override
     public void traverse_path( String path ) {
         Path unixPathObj = parse_path( path );
-        int threadsCount = Runtime.getRuntime().availableProcessors()*(10);
+        int threadsCount = Runtime.getRuntime().availableProcessors() * ( 10 );
         ExecutorService executorService = Executors.newFixedThreadPool( threadsCount );
         try ( Stream< Path > stream = Files.list( unixPathObj ) ) {
             // only works for the files in the path now the whole path
             List< TreeNodePreparationTask > taskList = stream.map( item -> {
-                return new TreeNodePreparationTask( item );
+                return new TreeNodePreparationTask( item, executorService );
             } ).toList();
             // submits all tasks to the executor and blocks until all tasks are complete
             List< Future< TreeNode > > futuresList = executorService.invokeAll( taskList );
@@ -84,7 +83,7 @@ public class TraversalManagerImpl implements TraversalManager {
 
     }
 
-    public TreeNode prepareNodTreeObject( Path pathObj ) {
+    public TreeNode prepareNodTreeObject( Path pathObj, ExecutorService executorService ) {
         try {
             File file = pathObj.toFile();
             TreeNode node = new TreeNode();
@@ -104,9 +103,25 @@ public class TraversalManagerImpl implements TraversalManager {
                 node.setChildrenNodes( null );
             } else {
                 List< TreeNode > listOfNodes = new ArrayList< TreeNode >();
-                for ( Path dirItem : subDirList ) {
-                    listOfNodes.add( prepareNodTreeObject( dirItem ) );
-                }
+//                for ( Path dirItem : subDirList ) {
+//                    listOfNodes.add( prepareNodTreeObject( dirItem, executorService ) );
+//                }
+                List< CompletableFuture< TreeNode > > completableFuture = subDirList.stream().map( subDirPath -> {
+                    TreeNodePreparationTask preparationTask = new TreeNodePreparationTask( subDirPath, executorService );
+
+                    return CompletableFuture.supplyAsync( () -> {
+                        try {
+                            return preparationTask.call();
+                        } catch ( Exception e ) {
+                            throw new RuntimeException( e );
+                        }
+                    }, executorService );
+
+                } ).toList();
+                completableFuture.stream().forEach( (future ) -> future.thenAccept( (treeNode ) ->  {
+                    listOfNodes.add( treeNode );
+                }) );
+                // setting children
                 node.setChildrenNodes( listOfNodes );
             }
             return node;
