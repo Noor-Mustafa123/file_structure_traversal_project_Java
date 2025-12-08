@@ -1,13 +1,14 @@
 package org.example.manager;
 
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
 
 import org.example.dto.TreeNode;
 
 public interface TraversalManager {
     
-    public void traverse_path( String path );
+    void traverse_path( String path );
 
-    public TreeNode prepareNodTreeObject( Path pathObj );
+    TreeNode prepareNodTreeObject( Path pathObj );
 
     }

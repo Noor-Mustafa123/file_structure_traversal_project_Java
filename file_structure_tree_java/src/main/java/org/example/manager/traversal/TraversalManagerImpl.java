@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.example.dto.TreeNode;
@@ -17,6 +18,8 @@ import org.example.manager.TraversalManager;
 import org.example.tasks.TreeNodePreparationTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.source.tree.Tree;
 
 import lombok.NoArgsConstructor;
 
@@ -36,26 +39,31 @@ public class TraversalManagerImpl implements TraversalManager {
     @Override
     public void traverse_path( String path ) {
         Path unixPathObj = parse_path( path );
-        ExecutorService executorService = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() );
+        int threadsCount = Runtime.getRuntime().availableProcessors()*(10);
+        ExecutorService executorService = Executors.newFixedThreadPool( threadsCount );
         try ( Stream< Path > stream = Files.list( unixPathObj ) ) {
             // only works for the files in the path now the whole path
-            List< TreeNode > nodeList = stream.map( item -> {
-                TreeNodePreparationTask treeNodePreparationTask = new TreeNodePreparationTask( item );
-                return executorService.submit( treeNodePreparationTask );
-            } ).map( treeNodeFuture -> {
+            List< TreeNodePreparationTask > taskList = stream.map( item -> {
+                return new TreeNodePreparationTask( item );
+            } ).toList();
+            // submits all tasks to the executor and blocks until all tasks are complete
+            List< Future< TreeNode > > futuresList = executorService.invokeAll( taskList );
+            // results
+            List< TreeNode > nodeList = futuresList.stream().map( treeNodeFuture -> {
                 try {
                     return treeNodeFuture.get();
                 } catch ( Exception e ) {
                     throw new RuntimeException( e );
                 }
             } ).toList();
-            executorService.shutdownNow();
+            executorService.shutdown();
             var objectMapper = new ObjectMapper();
             OutputStream outputPath = Files.newOutputStream( Path.of( OUTPUT_FILE_PATH ) );
             outputPath.write( objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes( nodeList ) );
             outputPath.close();
-        } catch ( IOException e ) {
+        } catch ( Exception e ) {
             throw new RuntimeException( "error during directory traversal", e );
+
         }
     }
 
