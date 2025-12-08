@@ -5,8 +5,11 @@ import lombok.*;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 @NoArgsConstructor
-public class NodeDTO {
+@JsonPropertyOrder({"id","name","path","type","childrenNodes"})
+public class TreeNode {
 
     private UUID id;
 
@@ -16,14 +19,14 @@ public class NodeDTO {
 
     private String type;
 
-    private List< NodeDTO > childrenNodes;
+    private List< TreeNode > childrenNodes;
 
 
-    public List< NodeDTO > getChildrenNodes() {
+    public List< TreeNode > getChildrenNodes() {
         return childrenNodes;
     }
 
-    public void setChildrenNodes(List< NodeDTO > childrenNodes) {
+    public void setChildrenNodes(List< TreeNode > childrenNodes) {
         this.childrenNodes = childrenNodes;
     }
 

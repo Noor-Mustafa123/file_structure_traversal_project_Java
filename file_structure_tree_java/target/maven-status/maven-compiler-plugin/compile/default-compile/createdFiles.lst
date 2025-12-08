@@ -1,4 +1,5 @@
 org/example/manager/traversal/TraversalManagerImpl.class
-org/example/dto/NodeDTO.class
 org/example/Main.class
+org/example/dto/TreeNode.class
 org/example/manager/TraversalManager.class
+org/example/tasks/TreeNodePreparationTask.class
