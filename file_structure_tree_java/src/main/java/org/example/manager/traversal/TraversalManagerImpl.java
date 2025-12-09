@@ -31,7 +31,7 @@ public class TraversalManagerImpl implements TraversalManager {
 
     static final String DIR = "Directory";
 
-    static final String OUTPUT_FILE_PATH = "/home/sces82/GIT/file_structure_traversal_project_Java/file_structure_tree_java/traversal_output.txt";
+    static final String OUTPUT_FILE_PATH = "/home/noor/IdeaProjects/file_structure_traversal_project_Java/file_structure_tree_java/traversal_output.txt";
 
     private static final Logger log = LoggerFactory.getLogger( TraversalManagerImpl.class );
 
@@ -106,7 +106,7 @@ public class TraversalManagerImpl implements TraversalManager {
 //                for ( Path dirItem : subDirList ) {
 //                    listOfNodes.add( prepareNodTreeObject( dirItem, executorService ) );
 //                }
-                List< CompletableFuture< TreeNode > > completableFuture = subDirList.stream().map( subDirPath -> {
+                List< CompletableFuture< TreeNode > > completableFutures = subDirList.stream().map( subDirPath -> {
                     TreeNodePreparationTask preparationTask = new TreeNodePreparationTask( subDirPath, executorService );
 
                     return CompletableFuture.supplyAsync( () -> {
@@ -118,9 +118,11 @@ public class TraversalManagerImpl implements TraversalManager {
                     }, executorService );
 
                 } ).toList();
-                completableFuture.stream().forEach( (future ) -> future.thenAccept( (treeNode ) ->  {
-                    listOfNodes.add( treeNode );
-                }) );
+                // synchronize level here for completion results from all threads
+                CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0])).join();
+                for (CompletableFuture<TreeNode> completableFuture :completableFutures){
+                    listOfNodes.add(completableFuture.join());
+                }
                 // setting children
                 node.setChildrenNodes( listOfNodes );
             }

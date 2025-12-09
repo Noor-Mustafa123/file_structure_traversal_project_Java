@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class Main {
 
-    static final String DEFAULT_PATH = "/home/sces82/Downloads";
+    static final String DEFAULT_PATH = "/home/noor/Downloads";
 
     private static final Logger log = LoggerFactory.getLogger( Main.class );
 
